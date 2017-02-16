@@ -16,7 +16,7 @@ signals:
 public slots:
 private:
     unsigned idLane_;
-    QGraphicsView *lineView;
+    QGraphicsView *laneView;
     QHBoxLayout *buttonsLayout;
     QPushButton *button;
     QGraphicsScene *scene;

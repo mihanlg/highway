@@ -5,30 +5,25 @@ Lane::Lane(QWidget *parent, unsigned idLane) :
     QVBoxLayout(parent),
     idLane_(idLane)
 {
-    std::string name = "laneLayout_" + std::to_string(idLane_);
-    setObjectName(name.c_str());
-    std::cout << name << std::endl;
+    scene = new QGraphicsScene();
+    QBrush roadBrush = QBrush(QPixmap(":/images/road.jpg"));
 
-    lineView = new QGraphicsView(parent);
-    lineView->setMinimumWidth(50);
-    lineView->setMaximumWidth(50);
-    lineView->setFrameShape(QFrame::NoFrame);
-    addWidget(lineView);
-    buttonsLayout = new QHBoxLayout(parent);
-    addLayout(buttonsLayout);
-    button = new QPushButton(parent);
+    laneView = new QGraphicsView();
+    laneView->setMinimumWidth(50);
+    laneView->setMaximumWidth(50);
+    laneView->setFrameShape(QFrame::NoFrame);
+    laneView->setScene(scene);
+    laneView->setBackgroundBrush(roadBrush);
+    laneView->setCacheMode(QGraphicsView::CacheBackground);
+    addWidget(laneView);
+
+    button = new QPushButton();
     button->setText(tr("+"));
     button->setMinimumWidth(50);
     button->setMaximumWidth(50);
+    buttonsLayout = new QHBoxLayout();
     buttonsLayout->addWidget(button);
-
-    scene = new QGraphicsScene(parent);
-    QPixmap roadBG(":/images/road.jpg");
-    QBrush roadBrush = QBrush(roadBG);
-
-    lineView->setScene(scene);
-    lineView->setBackgroundBrush(roadBrush);
-    lineView->setCacheMode(QGraphicsView::CacheBackground);
+    addLayout(buttonsLayout);
 
 }
 
@@ -36,5 +31,5 @@ Lane::~Lane() {
     delete scene;
     delete button;
     delete buttonsLayout;
-    delete lineView;
+    delete laneView;
 }

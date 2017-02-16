@@ -20,7 +20,7 @@ void HighwayWindow::drawRoad(unsigned nLanes) {
     if (nLanes != 0) nLanes_ = nLanes;
     lanes_.clear();
     for (unsigned i = 0; i < nLanes_; i++) {
-        lanes_.push_back(std::make_shared<Lane>(this, i));
+        lanes_.push_back(std::make_shared<Lane>(this->parentWidget(), i));
         ui->roadLayout->addLayout(lanes_.back().get());
     }
 }

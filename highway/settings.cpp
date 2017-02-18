@@ -19,8 +19,8 @@ double Settings::getRandomSpeed() {
     double stddev = 2*sqrt(maxSpeed - minSpeed + 1e-8);
     std::normal_distribution<double> dist(mean, stddev);
     double speed = dist(generator);
-    std::cout << speed << std::endl;
-    return speed/50;
+    //std::cout << speed << std::endl;
+    return speed;
 }
 
 void Settings::setMinSpeed(int speed) {

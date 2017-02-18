@@ -5,6 +5,7 @@
 #include <QGraphicsItem>
 #include <QBrush>
 #include <memory>
+#include <iostream>
 
 #include "settings.h"
 
@@ -20,12 +21,22 @@ public:
     ~Car();
     qreal getPos();
     qreal getLength();
-    void moveBy(qreal dx, qreal dy);
     void move();
+protected:
+    void speedUp(double toSpeed);
+    void speedDown(double toSpeed = 0);
+    void moveBy(qreal dx, qreal dy);
+    void mousePressEvent(QGraphicsSceneMouseEvent *event);
+public:
+    enum CarState {
+        Broken,
+        Working
+    };
 private:
-    double initSpeed_;
+    double initSpeed_, currentSpeed_;
     std::shared_ptr<Settings> settings_;
-    QBrush redBrush, greenBrush, blueBrush;
+    int state_;
+    QBrush redBrush_, greenBrush_, blueBrush_, yellowBrush_;
 };
 
 #endif // CAR_H

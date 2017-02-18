@@ -13,13 +13,21 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        highwaywindow.cpp \
-    lane.cpp
+    lane.cpp \
+    highway.cpp \
+    car.cpp \
+    laneview.cpp \
+    settings.cpp
 
-HEADERS  += highwaywindow.h \
-    lane.h
+HEADERS  += \
+    lane.h \
+    highway.h \
+    car.h \
+    laneview.h \
+    settings.h
 
-FORMS    += highwaywindow.ui
+FORMS    += \
+    highway.ui
 
 DISTFILES +=
 

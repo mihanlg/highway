@@ -1,13 +1,13 @@
-#include "highwaywindow.h"
+#include "highway.h"
 #include <QApplication>
 
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    HighwayWindow w;
+    Highway w;
     w.show();
-    w.drawRoad(10);
+    w.drawHighway();
     //QTimer timer;
     //QObject::connect(&timer, SIGNAL(timeout()), &scene, SLOT(advance()));
     //timer.start(1000 / 33);

@@ -37,8 +37,9 @@ Lane::Lane(std::shared_ptr<Settings> settings, QWidget *parent, unsigned idLane)
     addLayout(buttonsLayout.get());
 
     timer = std::make_shared<QTimer>();
-    timer->setInterval(20);
+    timer->setInterval(40);
     connect(timer.get(), SIGNAL(timeout()), this, SLOT(moveCars()));
+
     timer->start();
 }
 

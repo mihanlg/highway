@@ -1,5 +1,6 @@
 #include "car.h"
-//#include <iostream>
+#include <iomanip>
+#include <sstream>
 
 Car::Car(std::shared_ptr<Settings> settings, QGraphicsItem *parent, qreal pos) :
     QGraphicsRectItem(baseCarX, -pos, baseCarWidth, baseCarLength, parent),
@@ -12,6 +13,11 @@ Car::Car(std::shared_ptr<Settings> settings, QGraphicsItem *parent, qreal pos) :
     setBrush(greenBrush_);
     initSpeed_ = currentSpeed_ = settings_->getRandomSpeed();
     state_ = Working;
+
+    speedText = std::make_shared<QGraphicsTextItem>();
+    speedText->setPlainText("000.0");
+    speedText->setPos(-speedText->boundingRect().width()/2, 0);
+    speedText->setParentItem(this);
 }
 
 
@@ -36,8 +42,10 @@ qreal Car::getLength() {
 void Car::speedUp(double toSpeed) {
     if (currentSpeed_ >= toSpeed) return;
     setBrush(blueBrush_);
-    double maxDelta = std::min(3.0, std::max(0.5, 0.2*fabs(initSpeed_ - currentSpeed_)));
-    double ds = std::min(maxDelta, toSpeed - currentSpeed_);
+    double maxDelta = settings_->getMaxAcceleration();
+    double minDelta = settings_->getMinAcceleration();
+    double ds = std::min(maxDelta, std::max(minDelta, 0.2*fabs(initSpeed_ - currentSpeed_)));
+    ds = std::min(ds, toSpeed - currentSpeed_);
     currentSpeed_ += ds;
 }
 
@@ -48,7 +56,7 @@ void Car::speedDown(double toSpeed) {
         return;
     }
     setBrush(yellowBrush_);
-    double maxDelta = 1.0;
+    double maxDelta = settings_->getMaxDeceleration();
     double ds = std::min(maxDelta, currentSpeed_ - toSpeed);
     currentSpeed_ -= ds;
 }
@@ -57,6 +65,12 @@ void Car::move() {
     if (state_ == Broken) speedDown();
     else if (currentSpeed_ < initSpeed_) speedUp(initSpeed_);
     else setBrush(greenBrush_);
+    //std::string speed;
+    //sprintf(&speed[0], "%f", currentSpeed_);
+    char speed[10];
+    sprintf(speed, "%.1f", currentSpeed_);
+    //QString speed = std::to_string(currentSpeed_).c_str();
+    speedText->setPlainText(speed);
     moveBy(0, currentSpeed_/20);
 }
 

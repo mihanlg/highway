@@ -10,8 +10,26 @@ Highway::Highway(QWidget *parent, unsigned nLanes) :
 {
     ui->setupUi(this);
     settings_ = std::make_shared<Settings>();
+    ui->spinMaxSpeedBox->setValue(100);
+    ui->spinMinSpeedBox->setValue(40);
+    ui->spinMinAccBox->setValue(0.1);
+    ui->spinMaxAccBox->setValue(1.0);
+    ui->spinMaxDecBox->setValue(1.5);
+    ui->autoAppearCheckButton->setChecked(false);
+    ui->spinMinAppearTimeBox->setValue(0.1);
+    ui->spinMaxAppearTimeBox->setValue(1.0);
+
     settings_->setMinSpeed(ui->spinMinSpeedBox->value());
     settings_->setMaxSpeed(ui->spinMaxSpeedBox->value());
+    settings_->setMinAcceleration(ui->spinMinAccBox->value());
+    settings_->setMaxAcceleration(ui->spinMaxAccBox->value());
+    settings_->setMaxDeceleration(ui->spinMaxDecBox->value());
+    settings_->setAutoAppear(ui->autoAppearCheckButton->isChecked());
+    settings_->setMinAppearTime(ui->spinMinAppearTimeBox->value());
+    settings_->setMaxAppearTime(ui->spinMaxAppearTimeBox->value());
+
+    timer = std::make_shared<QTimer>();
+    connect(timer.get(), SIGNAL(timeout()), this, SLOT(addRandomCarWithTimer()));
 }
 
 Highway::~Highway()
@@ -36,6 +54,19 @@ void Highway::addLane() {
 void Highway::removeLane() {
     lanes_.pop_back();
     nLanes_--;
+}
+
+void Highway::addRandomCarWithTimer() {
+    timer->stop();
+    addRandomCar();
+    double t = settings_->getRandomAppearTime();
+    timer->setInterval(t);
+    timer->start();
+}
+
+void Highway::addRandomCar() {
+    int i = rand()%lanes_.size();
+    lanes_[i]->addCar();
 }
 
 void Highway::on_addLaneButton_clicked()
@@ -70,6 +101,47 @@ void Highway::on_spinMaxSpeedBox_valueChanged(int val)
 
 void Highway::on_addCarButton_clicked()
 {
-    int i = rand()%lanes_.size();
-    lanes_[i]->addCar();
+    addRandomCar();
+}
+
+void Highway::on_spinMinAccBox_valueChanged(double val)
+{
+    settings_->setMinAcceleration(val);
+}
+
+void Highway::on_spinMaxAccBox_valueChanged(double val)
+{
+    settings_->setMaxAcceleration(val);
+}
+
+void Highway::on_spinMaxDecBox_valueChanged(double val)
+{
+    settings_->setMaxDeceleration(val);
+}
+
+void Highway::on_autoAppearCheckButton_clicked()
+{
+    settings_->setAutoAppear(ui->autoAppearCheckButton->isChecked());
+    if (ui->autoAppearCheckButton->isChecked()) {
+        double t = settings_->getRandomAppearTime();
+        timer->setInterval(t);
+        timer->start();
+    }
+    else timer->stop();
+}
+
+void Highway::on_spinMinAppearTimeBox_valueChanged(double val)
+{
+    if (val > ui->spinMaxAppearTimeBox->value()) {
+        ui->spinMaxAppearTimeBox->setValue(val);
+    }
+    settings_->setMinAppearTime(val);
+}
+
+void Highway::on_spinMaxAppearTimeBox_valueChanged(double val)
+{
+    if (val < ui->spinMinAppearTimeBox->value()) {
+        ui->spinMinAppearTimeBox->setValue(val);
+    }
+    settings_->setMaxAppearTime(val);
 }

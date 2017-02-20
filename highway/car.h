@@ -37,6 +37,8 @@ private:
     std::shared_ptr<Settings> settings_;
     int state_;
     QBrush redBrush_, greenBrush_, blueBrush_, yellowBrush_;
+    std::shared_ptr<QGraphicsTextItem> speedText;
+
 };
 
 #endif // CAR_H

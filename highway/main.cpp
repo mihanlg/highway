@@ -1,12 +1,12 @@
-#include "highway.h"
+#include "manipulator.h"
 #include <QApplication>
 
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    Highway w;
-    w.show();
-    w.drawHighway();
+    Manipulator man;
+    man.show();
+    man.drawHighway();
     return a.exec();
 }

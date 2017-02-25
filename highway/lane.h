@@ -5,8 +5,6 @@
 #include <QtWidgets>
 #include <vector>
 #include <memory>
-#include <thread>
-#include <chrono>
 
 #include "car.h"
 #include "laneview.h"
@@ -25,15 +23,17 @@ signals:
 
 public slots:
     void addCar();
-    void moveCars();
+    void updateCars();
+    bool isOpened();
 private:
     std::shared_ptr<Settings> settings_;
     unsigned idLane_;
-    std::shared_ptr<LaneView> laneView;
-    std::shared_ptr<QHBoxLayout> buttonsLayout;
-    std::shared_ptr<QPushButton> button;
-    std::shared_ptr<QGraphicsScene> scene;
-    std::shared_ptr<QTimer> timer;
+    bool opened_;
+    std::shared_ptr<LaneView> laneView_;
+    std::shared_ptr<QHBoxLayout> buttonsLayout_;
+    std::shared_ptr<QPushButton> button_;
+    std::shared_ptr<QGraphicsScene> scene_;
+    std::shared_ptr<QTimer> timer_;
     std::vector<std::shared_ptr<Car>> cars_;
 };
 

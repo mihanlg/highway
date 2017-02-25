@@ -3,12 +3,12 @@
 
 #include <random>
 
-class Highway;
+class Manipulator;
 
 class Settings
 {
 public:
-    friend class Highway;
+    friend class Manipulator;
     Settings();
     //getters
     int getMinSpeed();
@@ -18,6 +18,8 @@ public:
     double getMaxAcceleration();
     double getMaxDeceleration();
     double getRandomAppearTime();
+    double getMinDistance();
+    double getMaxDistance();
 private:
     //setters
     void setMinSpeed(int speed);
@@ -28,12 +30,15 @@ private:
     void setAutoAppear(bool state);
     void setMinAppearTime(double time);
     void setMaxAppearTime(double time);
+    void setMinDistance(double distance);
+    void setMaxDistance(double distance);
 private:
     std::default_random_engine generator;
     int minSpeed, maxSpeed;
     double minAcceleration, maxAcceleration, maxDeceleration;
     bool autoAppear;
     double minAppearTime, maxAppearTime;
+    double minDistance, maxDistance;
 };
 
 #endif // SETTINGS_H

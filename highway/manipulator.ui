@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>HighwayWindow</class>
- <widget class="QMainWindow" name="HighwayWindow">
+ <class>ManipulatorWindow</class>
+ <widget class="QMainWindow" name="ManipulatorWindow">
   <property name="windowModality">
    <enum>Qt::NonModal</enum>
   </property>
@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>500</width>
-    <height>600</height>
+    <height>900</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -268,7 +268,7 @@
              <number>1</number>
             </property>
             <property name="minimum">
-             <double>1.000000000000000</double>
+             <double>0.100000000000000</double>
             </property>
             <property name="maximum">
              <double>10.000000000000000</double>
@@ -311,6 +311,59 @@
             </property>
             <property name="value">
              <double>2.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_5">
+          <item>
+           <widget class="QLabel" name="label_7">
+            <property name="text">
+             <string>Дистанция: мин.</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDoubleSpinBox" name="spinMinDistanceBox">
+            <property name="decimals">
+             <number>1</number>
+            </property>
+            <property name="minimum">
+             <double>1.000000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>3.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>0.100000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_4">
+            <property name="text">
+             <string>макс.</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDoubleSpinBox" name="spinMaxDistanceBox">
+            <property name="decimals">
+             <number>1</number>
+            </property>
+            <property name="minimum">
+             <double>1.000000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>5.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>0.100000000000000</double>
+            </property>
+            <property name="value">
+             <double>3.000000000000000</double>
             </property>
            </widget>
           </item>

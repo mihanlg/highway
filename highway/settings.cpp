@@ -40,6 +40,15 @@ double Settings::getRandomAppearTime() {
     return (minAppearTime + d*(maxAppearTime - minAppearTime))*1e3;
 }
 
+
+double Settings::getMinDistance() {
+    return minDistance;
+}
+
+double Settings::getMaxDistance() {
+    return maxDistance;
+}
+
 void Settings::setMinSpeed(int speed) {
     minSpeed = speed;
 }
@@ -70,4 +79,13 @@ void Settings::setMinAppearTime(double time) {
 
 void Settings::setMaxAppearTime(double time) {
     maxAppearTime = time;
+}
+
+
+void Settings::setMinDistance(double distance) {
+    minDistance = distance;
+}
+
+void Settings::setMaxDistance(double distance) {
+    maxDistance = distance;
 }

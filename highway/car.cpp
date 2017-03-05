@@ -1,146 +1,219 @@
 #include "car.h"
-#include <iomanip>
-#include <sstream>
 
-Car::Car(std::shared_ptr<Settings> settings, QObject *parent_o, QGraphicsItem *parent, qreal pos) :
+Car::Car(std::shared_ptr<Settings> settings, double maxCurrentSpeed, int carID, QObject *parent_o, QGraphicsItem *parent, qreal pos) :
     QObject(parent_o),
     QGraphicsRectItem(baseCarX, -pos, baseCarWidth, baseCarLength, parent),
-    settings_(settings)
+    settings_(settings),
+    carID_(carID)
 {
-    blueBrush_ = QBrush(Qt::blue);
-    redBrush_ = QBrush(Qt::red);
-    greenBrush_ = QBrush(Qt::green);
-    yellowBrush_ = QBrush(Qt::yellow);
-    magentaBrush_ = QBrush(Qt::magenta);
-    setBrush(greenBrush_);
-    initSpeed_ = currentSpeed_ = settings_->getRandomSpeed();
+    speedingUpColor_ = QBrush(Qt::blue);
+    brokenColor_ = QBrush(Qt::red);
+    movingColor_ = QBrush(Qt::green);
+    slowingDownColor_ = QBrush(Qt::yellow);
+    followingColor_ = QBrush(Qt::darkGreen);
+    crawlingColor_ = QBrush(Qt::magenta);
+    setBrush(movingColor_);
+    initSpeed_ = settings_->getRandomSpeed();
+    currentSpeed_ = maxCurrentSpeed < 0 ? initSpeed_ : std::min(maxCurrentSpeed, initSpeed_);
     state_ = Moving;
+    isFollowed_ = false;
 
     speedText = std::make_shared<QGraphicsTextItem>();
     speedText->setPlainText("000.0");
-    speedText->setPos(-speedText->boundingRect().width()/2, 0);
+    speedText->setRotation(-90.0);
     speedText->setParentItem(this);
+    speedText->setPos(-speedText->boundingRect().height()/2, speedText->boundingRect().width()-2);
 
-    //brokenTimer_ = std::make_shared<QTimer>();
-    //connect(brokenTimer_.get(), SIGNAL(timeout()), this, SLOT(fixMe()));
-    //brokenTimer_->setInterval(5000);
+    for (unsigned i = 0; i < settings_->getReaction(); i++) speeds.push(currentSpeed_);
 
+    brokenTimer_ = std::make_shared<QTimer>();
+    connect(brokenTimer_.get(), SIGNAL(timeout()), this, SLOT(fix()));
 }
 
-
-Car::~Car()
-{
-
+int Car::getCarID() {
+    return carID_;
 }
 
-void Car::mousePressEvent(QGraphicsSceneMouseEvent *event)
+double Car::getDangerousDistance() {
+    return settings_->getMinDistance()*getLength();
+}
+
+double Car::getBrakeDistance() {
+    return settings_->getMaxDistance()*getLength();
+}
+
+void Car::mousePressEvent(QGraphicsSceneMouseEvent *)
 {
-    state_ = state_ == Broken ? Moving : Broken;
+    if ((state_ == Broken) || (state_ == Crawling)) {
+        fix();
+    } else crawl();
+}
+
+void Car::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *)
+{
+    if (state_ != Broken) state_ = Broken;
 }
 
 qreal Car::getPos() {
-    return -pos().y();
+    return pos().y();
 }
 
 qreal Car::getLength() {
     return rect().height();
 }
 
-double Car::getSpeed() {
+double Car::getReactionSpeed() {
+    return speeds.front();
+}
+
+double Car::getRealSpeed() {
     return currentSpeed_;
 }
 
-/*void Car::speedUp(double toSpeed) {
-    if (currentSpeed_ >= toSpeed) return;
-    setBrush(blueBrush_);
-    double maxDelta = settings_->getMaxAcceleration();
-    double minDelta = settings_->getMinAcceleration();
-    double ds = std::min(maxDelta, std::max(minDelta, 0.2*fabs(initSpeed_ - currentSpeed_)));
-    ds = std::min(ds, toSpeed - currentSpeed_);
-    currentSpeed_ += ds;
+bool Car::isFollowed() {
+    return isFollowed_;
 }
 
-void Car::speedDown(double toSpeed) {
-    if (state_ == Broken && currentSpeed_ <= toSpeed) { setBrush(redBrush_); return; }
-    else if (state_ == Follwing && currentSpeed_ == toSpeed) { setBrush(orangeBrush_); }
-    else setBrush(yellowBrush_);
-    //if (currentSpeed <= toSpeed) return;
-    double maxDelta = settings_->getMaxDeceleration();
-    double ds = std::min(maxDelta, currentSpeed_ - toSpeed);
-    currentSpeed_ -= ds;
-}*/
+bool Car::isFollowing() {
+    return state_ == Following;
+}
+
+bool Car::isBroken() {
+    return state_ == Broken;
+}
+
+bool Car::isCrawling() {
+    return state_ == Crawling;
+}
 
 void Car::setSpeed(double toSpeed) {
+    toSpeed = std::min(initSpeed_, toSpeed);
     double delta =  toSpeed - currentSpeed_;
+    while (speeds.size() >= settings_->getReaction()) speeds.pop();
+    speeds.push(currentSpeed_);
+    if (state_ == Broken && fabs(currentSpeed_) <= eps) {
+        setBrush(brokenColor_);
+        currentSpeed_ = 0;
+        return;
+    }
+    if (fabs(delta) <= eps) {
+        if (state_ == Following) setBrush(followingColor_);
+        else if (state_ == Crawling) setBrush(crawlingColor_);
+        else setBrush(movingColor_);
+        currentSpeed_ = toSpeed;
+        return;
+    }
     double ds = 0;
-    if (state_ == Broken && currentSpeed_ == 0.0) { setBrush(redBrush_); return; }
-    else if (state_ == Following && delta == 0) { setBrush(magentaBrush_); }
-    if (delta < 0) {
-        setBrush(yellowBrush_);
+    if (delta < -eps) {
+        setBrush(slowingDownColor_);
         double minDelta = -settings_->getMaxDeceleration();
         ds = std::max(minDelta, delta);
     }
-    else if (delta > 0) {
-        setBrush(blueBrush_);
+    else if (delta > eps) {
+        setBrush(speedingUpColor_);
         double maxDelta = settings_->getMaxAcceleration();
         double minDelta = settings_->getMinAcceleration();
-        ds = std::min(maxDelta, std::max(minDelta, 0.2*fabs(initSpeed_ - currentSpeed_)));
+        ds = std::min(maxDelta, std::max(minDelta, accelerationCoef*fabs(initSpeed_ - currentSpeed_)));
         ds = std::min(ds, delta);
     }
     currentSpeed_ += ds;
 }
 
+void Car::checkBrakeTimer() {
+    if (settings_->isAutoFixOn()) {
+        if (state_ == Moving || state_ == Following) brokenTimer_->stop();
+        else {
+            brokenTimer_->setInterval(settings_->getAutoFixTime()*1000);
+            brokenTimer_->start();
+        }
+    } else brokenTimer_->stop();
+}
+
 void Car::brake(double meanSpeed) {
     state_ = Broken;
     currentSpeed_ = meanSpeed;
-    //brokenTimer_->start();
+    checkBrakeTimer();
 }
+
+void Car::crawl() {
+    state_ = Crawling;
+    checkBrakeTimer();
+}
+
 
 void Car::fix() {
     state_ = Moving;
-    //brokenTimer_->stop();
+    checkBrakeTimer();
 }
 
-void Car::unfollow() {
-    if (state_ == Following) state_ = Moving;
+void Car::follow(std::shared_ptr<Car> toFollowCar) {
+    state_ = Following;
+    qreal dist = toFollowCar->getPos() - getPos();
+    qreal dangerousDist = getDangerousDistance();
+    qreal brakeDist = getBrakeDistance();
+    if (dist < dangerousDist)
+        followingSpeed_ = (dist/dangerousDist)*std::min(toFollowCar->getReactionSpeed(), currentSpeed_);
+    else {
+        qreal coef =  0.1 + 0.9*(dist - dangerousDist)/(brakeDist - dangerousDist);
+        followingSpeed_ = std::max(coef*initSpeed_, (toFollowCar->getReactionSpeed() + currentSpeed_)/2);
+    }
+    toFollowCar->isFollowed_ = true;
 }
+
+void Car::unfollow(std::shared_ptr<Car> leadingCar) {
+    leadingCar->isFollowed_ = false;
+    if (state_ == Following) state_ = Moving;
+    followingSpeed_ = initSpeed_;
+}
+
+
 
 void Car::move() {
     if (state_ == Broken) setSpeed(0);
+    else if (state_ == Crawling) setSpeed(settings_->getCrawlingSpeed());
     else if (state_ == Following) setSpeed(followingSpeed_);
-    else if (currentSpeed_ < initSpeed_) setSpeed(initSpeed_);
-    else setBrush(greenBrush_);
-    char speed[10];
-    sprintf(speed, "%.1f", currentSpeed_);
-    speedText->setPlainText(speed);
-    moveBy(0, currentSpeed_/20);
+    else setSpeed(initSpeed_);
+    updateText();
+    moveBy(0, currentSpeed_/speedCoef);
 }
 
 void Car::move(std::shared_ptr<Car> leading) {
-    if (state_ != Broken) {
-        qreal lpos = leading->getPos();
-        if (lpos - getPos() < settings_->getMaxDistance()*leading->getLength()) {
-            if (((lpos - getPos()) > settings_->getMinDistance()*leading->getLength()) ||
-                (followingSpeed_ > leading->getSpeed()))
-                followingSpeed_ = leading->getSpeed();
-            state_ = Following;
-            setBrush(magentaBrush_);
-        } else state_ = Moving;
+    if (state_ != Broken && state_ != Crawling) {
+        qreal dist = leading->getPos() - getPos();
+        qreal brakeDist = getBrakeDistance();
+        if ((dist < brakeDist) && (leading->getReactionSpeed() < initSpeed_)) {
+            follow(leading);
+        }
     }
     move();
     if (getPos() > leading->getPos() - leading->getLength()) {
-        double meanSpeed = (getSpeed() + leading->getSpeed()) / 2;
+        double meanSpeed = (currentSpeed_ + leading->currentSpeed_) / 2;
         leading->setPos(getPos()+leading->getLength()+1);
         brake(meanSpeed);
         leading->brake(meanSpeed);
     }
 }
 
-void Car::moveBy(qreal dx, qreal dy) {
-    QGraphicsRectItem::moveBy(dx, -dy);
+void Car::setPos(qreal pos) {
+    moveBy(0, pos - getPos());
 }
 
-void Car::setPos(qreal pos) {
-    qreal dy = pos - getPos();
-    moveBy(0, dy);
+void Car::updateText() {
+    if (settings_->getShowSpeed() == showNothing) {
+        speedText->hide();
+    }
+    else {
+        char text[10];
+        if (settings_->getShowSpeed() == showSpeed) {
+            sprintf(text, "%.1f", currentSpeed_);
+        }
+        else if (settings_->getShowSpeed() == showNumber) {
+            sprintf(text, "%d", carID_);
+        }
+        else if (settings_->getShowSpeed() == showStatus) {
+            sprintf(text, "%d:%s%s", carID_, (isFollowing()? "F" : "N"), (isFollowed()? "F" : "N"));
+        }
+        speedText->setPlainText(text);
+        speedText->show();
+    }
 }

@@ -1,10 +1,14 @@
 #include "settings.h"
 #include <iostream>
 
-Settings::Settings()
-{
-
+Settings::Settings() {
+    srand(time(NULL));
+    std::random_device rd;
+    generator = std::mt19937(rd());
+    lastCarID = -1;
 }
+
+//GETTERS
 
 int Settings::getMinSpeed() {
     return minSpeed;
@@ -49,6 +53,35 @@ double Settings::getMaxDistance() {
     return maxDistance;
 }
 
+int Settings::getAutoFixTime() {
+    return autoFixTime;
+}
+
+bool Settings::isAutoFixOn() {
+    return autoFixState;
+}
+
+int Settings::getCarID() {
+    return ++lastCarID;
+}
+
+int Settings::getCrawlingSpeed() {
+    return crawlingSpeed;
+}
+
+showInfo Settings::getShowSpeed() {
+    return showSpeed;
+}
+
+bool Settings::isPaused() {
+    return paused;
+}
+
+unsigned Settings::getReaction() {
+    return reaction;
+}
+
+//SETTERS
 void Settings::setMinSpeed(int speed) {
     minSpeed = speed;
 }
@@ -88,4 +121,28 @@ void Settings::setMinDistance(double distance) {
 
 void Settings::setMaxDistance(double distance) {
     maxDistance = distance;
+}
+
+void Settings::setAutoFixTime(int time) {
+    autoFixTime = time;
+}
+
+void Settings::setAutoFixState(bool state) {
+    autoFixState = state;
+}
+
+void Settings::setCrawlingSpeed(int speed) {
+    crawlingSpeed = speed;
+}
+
+void Settings::setShowSpeed(showInfo state) {
+    showSpeed = state;
+}
+
+void Settings::setPause(bool state) {
+    paused = state;
+}
+
+void Settings::setReaction(unsigned val) {
+    reaction = val;
 }

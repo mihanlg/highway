@@ -2,14 +2,13 @@
 #define LANEVIEW_H
 
 #include <QtWidgets>
+#include "settings.h"
 
-#define baseLaneWidth 50
-#define baseLaneX -baseLaneWidth/2
-#define minLaneHeight 300
 
 class LaneView : public QGraphicsView
 {
 public:
+    LaneView();
 private:
     void resizeEvent(QResizeEvent *event) override;
 };

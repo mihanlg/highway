@@ -5,8 +5,7 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    Manipulator man;
+    Manipulator man(3);
     man.show();
-    man.drawHighway();
     return a.exec();
 }

@@ -167,7 +167,7 @@ void Lane::updateCars() {
     while (car != cars_.end()) {
         (*car)->updateText();
         //clean
-        if ((*car)->getPos() > laneView_->frameRect().height() + (*car)->getLength()) {
+        if ((*car)->getPos() > laneView_->frameRect().height() + (*car)->getLength() + 200) {
             if ((*car)->isFollowed()) (*(car+1))->unfollow(*car);
             car = cars_.erase(car);
             continue;

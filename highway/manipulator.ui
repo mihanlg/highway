@@ -81,7 +81,7 @@
     <item>
      <layout class="QVBoxLayout" name="settingsLayout">
       <item>
-       <widget class="QGroupBox" name="groupBox_2">
+       <widget class="QGroupBox" name="highwayBox">
         <property name="title">
          <string>Шоссе</string>
         </property>
@@ -152,7 +152,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QGroupBox" name="groupBox">
+       <widget class="QGroupBox" name="transportBox">
         <property name="title">
          <string>Транспорт</string>
         </property>
@@ -442,7 +442,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QGroupBox" name="groupBox_3">
+       <widget class="QGroupBox" name="modellingBox">
         <property name="title">
          <string>Моделирование</string>
         </property>
@@ -696,14 +696,6 @@
           </layout>
          </item>
         </layout>
-        <zorder>groupBox_2</zorder>
-        <zorder>groupBox_2</zorder>
-        <zorder></zorder>
-        <zorder></zorder>
-        <zorder></zorder>
-        <zorder>addCarButton</zorder>
-        <zorder></zorder>
-        <zorder>horizontalLayoutWidget_2</zorder>
        </widget>
       </item>
       <item>

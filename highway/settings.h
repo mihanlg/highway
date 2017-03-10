@@ -20,7 +20,7 @@ class Car;
 #define speedCoef 40
 #define accelerationCoef 0.2
 
-#define eps 1e-3
+#define eps 1e-1
 
 enum showInfo {
     showNothing,

@@ -216,8 +216,8 @@ void Lane::clean() {
 
 void Lane::scale(qreal s) {
     //setSizeConstraint();
-    laneView_->scale(s, s);
-    laneView_->resize(laneView_->width()*s, laneView_->height());
+    //laneView_->scale(s, s);
+    //laneView_->resize(laneView_->width()*s, laneView_->height());
     /*button_->resize(button_->width()*s, button_->height());
     QRect but, lan;
     QRectF sc;
@@ -234,6 +234,7 @@ void Lane::scale(qreal s) {
     std::cout << "B: " << button_->geometry().width() << std::endl;
     std::cout << "BL: " << buttonsLayout_->geometry().width() << std::endl;
     std::cout << "Lane: " << geometry().width() << std::endl;*/
+
 }
 
 Lane::~Lane() {

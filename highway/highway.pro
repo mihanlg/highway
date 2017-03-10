@@ -17,14 +17,16 @@ SOURCES += main.cpp\
     car.cpp \
     laneview.cpp \
     settings.cpp \
-    manipulator.cpp
+    manipulator.cpp \
+    highway.cpp
 
 HEADERS  += \
     lane.h \
     car.h \
     laneview.h \
     settings.h \
-    manipulator.h
+    manipulator.h \
+    highway.h
 
 FORMS    += \
     manipulator.ui

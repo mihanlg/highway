@@ -273,7 +273,7 @@ void Manipulator::scale(qreal s) {
 
 void Manipulator::on_zoomOutButton_clicked()
 {
-    scale(0.5);
+
 }
 
 void Manipulator::on_zoomInButton_clicked()

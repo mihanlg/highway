@@ -148,16 +148,16 @@ void Car::fix() {
 
 void Car::follow(std::shared_ptr<Car> toFollowCar) {
     state_ = Following;
+    toFollowCar->isFollowed_ = true;
     qreal dist = toFollowCar->getPos() - getPos();
     qreal dangerousDist = getDangerousDistance();
     qreal brakeDist = getBrakeDistance();
-    if (dist < dangerousDist)
-        followingSpeed_ = (dist/dangerousDist)*std::min(toFollowCar->getReactionSpeed(), currentSpeed_);
-    else {
-        qreal coef =  0.1 + 0.9*(dist - dangerousDist)/(brakeDist - dangerousDist);
-        followingSpeed_ = std::max(coef*initSpeed_, (toFollowCar->getReactionSpeed() + currentSpeed_)/2);
-    }
-    toFollowCar->isFollowed_ = true;
+    if (dist <= dangerousDist)
+        followingSpeed_ = (dist/dangerousDist)*toFollowCar->getReactionSpeed();
+    else if (dist <= brakeDist) {
+        qreal coef =  (dist - dangerousDist)/(brakeDist - dangerousDist);
+        followingSpeed_ = ((1-coef)*toFollowCar->getReactionSpeed() + coef*initSpeed_);
+    } else unfollow(toFollowCar);
 }
 
 void Car::unfollow(std::shared_ptr<Car> leadingCar) {
@@ -184,13 +184,16 @@ void Car::move(std::shared_ptr<Car> leading) {
         if ((dist < brakeDist) && (leading->getReactionSpeed() < initSpeed_)) {
             follow(leading);
         }
+        else if (isFollowing()) {
+            unfollow(leading);
+        }
     }
     move();
     if (getPos() > leading->getPos() - leading->getLength()) {
         double meanSpeed = (currentSpeed_ + leading->currentSpeed_) / 2;
         leading->setPos(getPos()+leading->getLength()+1);
-        brake(meanSpeed);
         leading->brake(meanSpeed);
+        brake(meanSpeed);
     }
 }
 

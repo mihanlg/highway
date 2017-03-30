@@ -6,6 +6,8 @@ Settings::Settings() {
     std::random_device rd;
     generator = std::mt19937(rd());
     lastCarID = -1;
+    width = baseLaneWidth;
+    scale = 1.0;
 }
 
 //GETTERS
@@ -85,7 +87,22 @@ unsigned Settings::getRandomCarLength() {
     return minCarLength + rand()%(maxCarLength - minCarLength + 1);
 }
 
+double Settings::getWidth() {
+    return width;
+}
+
+double Settings::getScale() {
+    return scale;
+}
+
 //SETTERS
+
+void Settings::updateWidth(double dw) {
+    double ds = 1 + dw/width;
+    width += dw;
+    scale *= ds;
+}
+
 void Settings::setMinSpeed(int speed) {
     minSpeed = speed;
 }

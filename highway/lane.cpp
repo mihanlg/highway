@@ -14,9 +14,10 @@ Lane::Lane(std::shared_ptr<Settings> &settings, std::weak_ptr<Lane> &left,
     QPixmap bg(":/images/road.jpg");
     QBrush roadBrush = QBrush(QPixmap(bg.scaledToWidth(baseLaneWidth)));
 
-    laneView_ = std::make_shared<LaneView>();
+    laneView_ = std::make_shared<LaneView>(settings_);
     //laneView_->setMinimumWidth(baseLaneWidth);
-    laneView_->setMaximumWidth(baseLaneWidth);
+    //laneView_->setMaximumWidth(baseLaneWidth);
+    laneView_->setFixedWidth(settings_->getWidth());
     laneView_->setMinimumHeight(minLaneHeight);
 
     laneView_->setFrameShape(QFrame::NoFrame);
@@ -29,12 +30,13 @@ Lane::Lane(std::shared_ptr<Settings> &settings, std::weak_ptr<Lane> &left,
     laneView_->verticalScrollBar()->blockSignals(true);
     laneView_->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     laneView_->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    laneView_->setScale(settings_->getScale());
     addWidget(laneView_.get());
 
     button_ = std::make_shared<QPushButton>();
     button_->setText(tr("+"));
     //button_->setMinimumWidth(baseLaneWidth);
-    button_->setMaximumWidth(baseLaneWidth);
+    button_->setFixedWidth(settings_->getWidth());
     connect(button_.get(), SIGNAL(clicked()), this, SLOT(addCar()));
 
     buttonsLayout_ = std::make_shared<QHBoxLayout>();
@@ -52,10 +54,10 @@ void Lane::setRight(std::weak_ptr<Lane> right) {
 void Lane::addCar() {
     double maxCurrentSpeed = -1;
     if (cars_.size() == 0 ||
-        (cars_.back()->getPos() - cars_.back()->getLength() > settings_->getMinDistance()*cars_.back()->getLength())) {
+        (cars_.back()->getPos() - cars_.back()->getLength() > settings_->getMinDistance()*baseCarLength)) {
         if (cars_.size() != 0) {
             auto leadingCar = cars_.back();
-            if (leadingCar->getPos() < settings_->getMaxDistance()*leadingCar->getLength())
+            if (leadingCar->getPos() - cars_.back()->getLength() < settings_->getMaxDistance()*baseCarLength)
                 maxCurrentSpeed = cars_.back()->getReactionSpeed();
         }
         cars_.push_back(std::make_shared<Car>(settings_, maxCurrentSpeed, settings_->getRandomCarLength(), settings_->getCarID()));
@@ -98,20 +100,8 @@ std::weak_ptr<Car> Lane::getFollowingCarInLane(std::shared_ptr<Lane> lane, doubl
 }
 
 bool Lane::checkLane(std::weak_ptr<Lane> lane) {
-    //std::shared_ptr<Lane> lane_;
     if (lane.lock()) return true;
     else return false;
-    /*
-    if ((lane_ = lane.lock())) {
-        double carPos = car->getPos();
-        double minDistance = car->getDangerousDistance();
-        for (auto iterCar: lane_->cars_) {
-            double iterCarPos = iterCar->getPos();
-            if (fabs(iterCarPos - carPos) < minDistance) return false;
-            if (iterCarPos < carPos) break;
-        }
-        return true;
-    } else return false;*/
 }
 
 bool Lane::tryChangeLane(std::vector<std::shared_ptr<Car>>::iterator &car,
@@ -174,7 +164,7 @@ void Lane::updateCars() {
     while (car != cars_.end()) {
         (*car)->updateText();
         //clean
-        if ((*car)->getPos() > laneView_->frameRect().height() + (*car)->getLength() + 200) {
+        if ((*car)->getPos() > laneView_->sceneRect().height() + (*car)->getLength() + 200) {
             if ((*car)->isFollowed()) (*(car+1))->unfollow(*car);
             car = cars_.erase(car);
             continue;
@@ -221,27 +211,12 @@ void Lane::clean() {
     cars_.clear();
 }
 
-void Lane::scale(qreal s) {
-    //setSizeConstraint();
-    //laneView_->scale(s, s);
-    //laneView_->resize(laneView_->width()*s, laneView_->height());
-    /*button_->resize(button_->width()*s, button_->height());
-    QRect but, lan;
-    QRectF sc;
-    but = buttonsLayout_->geometry();
-    but.setWidth(but.width()*s);
-    buttonsLayout_->setGeometry(but);
-    lan = geometry();
-    lan.setWidth(lan.width()*s);
-    setGeometry(lan);
-    sc = scene_->sceneRect();
-    sc.setWidth(sc.width()*s);
-    scene_->setSceneRect(sc);
-    std::cout << "LV: " << laneView_->geometry().width() << std::endl;
-    std::cout << "B: " << button_->geometry().width() << std::endl;
-    std::cout << "BL: " << buttonsLayout_->geometry().width() << std::endl;
-    std::cout << "Lane: " << geometry().width() << std::endl;*/
-
+void Lane::scale(double dw) {
+    double ds = 1 + double(dw)/laneView_->width();
+    laneView_->setScale(ds);
+    int w = settings_->getWidth();
+    laneView_->setFixedWidth(w);
+    button_->setFixedWidth(w);
 }
 
 Lane::~Lane() {

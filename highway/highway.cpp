@@ -22,8 +22,9 @@ Lane* Highway::addLane() {
         if (lanes_.size() > 0)
             lanes_.back()->setRight(newLane);
         lanes_.push_back(newLane);
+        return lanes_.back().get();
     }
-    return lanes_.back().get();
+    return nullptr;
 }
 
 void Highway::deleteLane() {
@@ -114,8 +115,10 @@ void Highway::clean() {
     }
 }
 
-void Highway::scale(qreal s) {
+void Highway::scale(double dw) {
+    if (settings_->getWidth() + dw < 10) return;
+    settings_->updateWidth(dw);
     for (auto lane: lanes_) {
-        lane->scale(s);
+        lane->scale(dw);
     }
 }

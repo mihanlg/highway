@@ -15,19 +15,19 @@ class Highway : public QObject
     Q_OBJECT
 public:
     Highway(std::shared_ptr<Settings> settings);
-    void scale(qreal s);
+    void scale(double dw);
     Lane* addLane();
     void deleteLane();
     void addRandomCar();
     void clean();
     void checkTimers();
-    void startUpdateTimer() {updateTimer_->start();}
-    void startAddRandomCarTimer() {addRandomCarTimer_->start();}
-    void stopAddRandomCarTimer() {addRandomCarTimer_->stop();}
-    void setAddRandomCarTimerInterval(double interval) {addRandomCarTimer_->setInterval(interval);}
-    void clear() {lanes_.clear();}
-    int getSize() {return lanes_.size();}
-    int getNLanes() {return lanes_.size() - lanes_.back()->isClosed();}
+    void startUpdateTimer();
+    void startAddRandomCarTimer();
+    void stopAddRandomCarTimer();
+    void setAddRandomCarTimerInterval(double interval);
+    void clear();
+    int getSize();
+    int getNLanes();
 private slots:
     void updateLanes();
     void addRandomCarWithTimer();

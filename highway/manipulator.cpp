@@ -192,12 +192,12 @@ void Manipulator::on_spinCrawlingSpeedBox_valueChanged(int val)
 
 void Manipulator::on_zoomOutButton_clicked()
 {
-
+    highway_->scale(-5.);
 }
 
 void Manipulator::on_zoomInButton_clicked()
 {
-    highway_->scale(2.0);
+    highway_->scale(5.);
 }
 
 void Manipulator::on_autoAppearCheckBox_clicked()

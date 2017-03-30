@@ -32,7 +32,7 @@ public:
     void open();
     void clean();
     void setRight(std::weak_ptr<Lane> right);
-    void scale(qreal s);
+    void scale(double dw);
 private:
     std::weak_ptr<Car> insertCar(std::shared_ptr<Car> &car);
     std::weak_ptr<Car> getLeadingCarInLane(std::shared_ptr<Lane> lane, double pos);

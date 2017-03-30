@@ -7,12 +7,6 @@ Car::Car(std::shared_ptr<Settings> settings, double maxCurrentSpeed, unsigned ca
     settings_(settings),
     carID_(carID)
 {
-    //QRectF r = rect();
-    //unsigned newLength = settings_->getRandomCarLength();
-    //r.setY(r.y() - (newHeight - r.height()));
-    //r.setHeight(newLength);
-    //setPos(getPos() - (newLength - getLength()));
-    //setRect(r);
     speedingUpColor_ = QBrush(Qt::blue);
     brokenColor_ = QBrush(Qt::red);
     movingColor_ = QBrush(Qt::green);
@@ -47,7 +41,7 @@ double Car::getDangerousDistance() {
 }
 
 double Car::getBrakeDistance() {
-    return settings_->getMaxDistance()*getLength();
+    return settings_->getMaxDistance()*baseCarLength;
 }
 
 void Car::setChangeLineLimit(int limit) {

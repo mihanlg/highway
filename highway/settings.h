@@ -57,6 +57,9 @@ public:
     void setPause(bool state);
     unsigned getReaction();
     unsigned getRandomCarLength();
+    double getWidth();
+    double getScale();
+    void updateWidth(double dw);
 private:
     //setters
     void setMinSpeed(int speed);
@@ -90,6 +93,7 @@ private:
     double minAppearTime, maxAppearTime;
     double minDistance, maxDistance;
     unsigned minCarLength, maxCarLength;
+    double width, scale;
     //std::weak_ptr<Car> carToShowInfo;
 };
 

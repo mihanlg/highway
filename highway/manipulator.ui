@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>500</width>
-    <height>1195</height>
+    <height>1204</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -354,7 +354,7 @@
               <number>1</number>
              </property>
              <property name="minimum">
-              <double>1.000000000000000</double>
+              <double>0.000000000000000</double>
              </property>
              <property name="maximum">
               <double>3.000000000000000</double>
@@ -373,7 +373,7 @@
               <number>1</number>
              </property>
              <property name="minimum">
-              <double>1.000000000000000</double>
+              <double>0.000000000000000</double>
              </property>
              <property name="maximum">
               <double>5.000000000000000</double>
@@ -434,6 +434,66 @@
                <string>Состояние</string>
               </property>
              </item>
+             <item>
+              <property name="text">
+               <string>Позиция</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <item>
+            <widget class="QLabel" name="carLengthLabel">
+             <property name="minimumSize">
+              <size>
+               <width>90</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>90</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Длина:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSpinBox" name="spinMinCarLengthBox">
+             <property name="minimum">
+              <number>30</number>
+             </property>
+             <property name="maximum">
+              <number>120</number>
+             </property>
+             <property name="singleStep">
+              <number>5</number>
+             </property>
+             <property name="value">
+              <number>40</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSpinBox" name="spinMaxCarLengthBox">
+             <property name="minimum">
+              <number>30</number>
+             </property>
+             <property name="maximum">
+              <number>120</number>
+             </property>
+             <property name="singleStep">
+              <number>5</number>
+             </property>
+             <property name="value">
+              <number>80</number>
+             </property>
             </widget>
            </item>
           </layout>

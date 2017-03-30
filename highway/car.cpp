@@ -1,11 +1,18 @@
 #include "car.h"
 
-Car::Car(std::shared_ptr<Settings> settings, double maxCurrentSpeed, int carID, QObject *parent_o, QGraphicsItem *parent, qreal pos) :
+Car::Car(std::shared_ptr<Settings> settings, double maxCurrentSpeed, unsigned carLength,
+         int carID, qreal pos, QObject *parent_o, QGraphicsItem *parent) :
     QObject(parent_o),
-    QGraphicsRectItem(baseCarX, -pos, baseCarWidth, baseCarLength, parent),
+    QGraphicsRectItem(baseCarX, pos+baseCarLength-carLength, baseCarWidth, carLength, parent),
     settings_(settings),
     carID_(carID)
 {
+    //QRectF r = rect();
+    //unsigned newLength = settings_->getRandomCarLength();
+    //r.setY(r.y() - (newHeight - r.height()));
+    //r.setHeight(newLength);
+    //setPos(getPos() - (newLength - getLength()));
+    //setRect(r);
     speedingUpColor_ = QBrush(Qt::blue);
     brokenColor_ = QBrush(Qt::red);
     movingColor_ = QBrush(Qt::green);
@@ -17,6 +24,7 @@ Car::Car(std::shared_ptr<Settings> settings, double maxCurrentSpeed, int carID, 
     currentSpeed_ = maxCurrentSpeed < 0 ? initSpeed_ : std::min(maxCurrentSpeed, initSpeed_);
     state_ = Moving;
     isFollowed_ = false;
+    changeLineLimit_ = 0;
 
     speedText = std::make_shared<QGraphicsTextItem>();
     speedText->setPlainText("000.0");
@@ -40,6 +48,14 @@ double Car::getDangerousDistance() {
 
 double Car::getBrakeDistance() {
     return settings_->getMaxDistance()*getLength();
+}
+
+void Car::setChangeLineLimit(int limit) {
+    changeLineLimit_ = limit;
+}
+
+int Car::getChangeLineLimit() {
+    return changeLineLimit_;
 }
 
 void Car::mousePressEvent(QGraphicsSceneMouseEvent *)
@@ -149,7 +165,7 @@ void Car::fix() {
 void Car::follow(std::shared_ptr<Car> toFollowCar) {
     state_ = Following;
     toFollowCar->isFollowed_ = true;
-    qreal dist = toFollowCar->getPos() - getPos();
+    qreal dist = toFollowCar->getPos() - toFollowCar->getLength() - getPos();
     qreal dangerousDist = getDangerousDistance();
     qreal brakeDist = getBrakeDistance();
     if (dist <= dangerousDist)
@@ -169,6 +185,7 @@ void Car::unfollow(std::shared_ptr<Car> leadingCar) {
 
 
 void Car::move() {
+    if (changeLineLimit_) changeLineLimit_--;
     if (state_ == Broken) setSpeed(0);
     else if (state_ == Crawling) setSpeed(settings_->getCrawlingSpeed());
     else if (state_ == Following) setSpeed(followingSpeed_);
@@ -179,7 +196,7 @@ void Car::move() {
 
 void Car::move(std::shared_ptr<Car> leading) {
     if (state_ != Broken && state_ != Crawling) {
-        qreal dist = leading->getPos() - getPos();
+        qreal dist = leading->getPos() - leading->getLength() - getPos();
         qreal brakeDist = getBrakeDistance();
         if ((dist < brakeDist) && (leading->getReactionSpeed() < initSpeed_)) {
             follow(leading);
@@ -206,7 +223,7 @@ void Car::updateText() {
         speedText->hide();
     }
     else {
-        char text[10];
+        char text[20];
         if (settings_->getShowSpeed() == showSpeed) {
             sprintf(text, "%.1f", currentSpeed_);
         }
@@ -215,6 +232,10 @@ void Car::updateText() {
         }
         else if (settings_->getShowSpeed() == showStatus) {
             sprintf(text, "%d:%s%s", carID_, (isFollowing()? "F" : "N"), (isFollowed()? "F" : "N"));
+        }
+        else if (settings_->getShowSpeed() == showPosition) {
+            sprintf(text, "%.0f:%.0f", getPos(), getPos()-getLength());
+
         }
         speedText->setPlainText(text);
         speedText->show();

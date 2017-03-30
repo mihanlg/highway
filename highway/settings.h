@@ -26,7 +26,8 @@ enum showInfo {
     showNothing,
     showSpeed,
     showNumber,
-    showStatus
+    showStatus,
+    showPosition
 };
 
 class Settings
@@ -47,6 +48,7 @@ public:
     int getCarID();
     int getAutoFixTime();
     bool isAutoFixOn();
+    bool isAutoAppearOn() { return autoAppear; }
     int getCrawlingSpeed();
     //std::weak_ptr<Car> getCarInfo() { return carToShowInfo; }
     //void setCarInfo(std::weak_ptr<Car> car) { carToShowInfo = car; }
@@ -54,6 +56,7 @@ public:
     bool isPaused();
     void setPause(bool state);
     unsigned getReaction();
+    unsigned getRandomCarLength();
 private:
     //setters
     void setMinSpeed(int speed);
@@ -71,6 +74,8 @@ private:
     void setCrawlingSpeed(int speed);
     void setShowSpeed(showInfo state);
     void setReaction(unsigned val);
+    void setMinCarLength(unsigned val);
+    void setMaxCarLength(unsigned val);
 private:
     std::mt19937 generator;
     bool paused;
@@ -84,6 +89,7 @@ private:
     bool autoAppear;
     double minAppearTime, maxAppearTime;
     double minDistance, maxDistance;
+    unsigned minCarLength, maxCarLength;
     //std::weak_ptr<Car> carToShowInfo;
 };
 

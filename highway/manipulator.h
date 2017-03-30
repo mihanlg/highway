@@ -5,14 +5,8 @@
 #include <QGraphicsItem>
 #include <QtWidgets>
 
-#include <vector>
-#include <memory>
-
-#include "lane.h"
 #include "settings.h"
-
-#define maxLanes_ 10
-#define updateTime_ 40
+#include "highway.h"
 
 namespace Ui {
 class ManipulatorWindow;
@@ -25,17 +19,9 @@ class Manipulator : public QMainWindow
 public:
     explicit Manipulator(unsigned nLanes = 1, QWidget *parent = 0);
     ~Manipulator();
-    void drawHighway(unsigned nLanes = 0);
 private slots:
     void updateNLanesLabel();
-    void addLane(unsigned nLanes = 1);
-    void deleteLane();
-    void addRandomCarWithTimer();
-    void addRandomCar();
-    void updateLanes();
-    void clean();
-    void checkTimers();
-    void scale(qreal s);
+    void drawHighway(unsigned nLanes);
 
     //INTERFACE
     void on_addLaneButton_clicked();
@@ -59,15 +45,14 @@ private slots:
     void on_zoomInButton_clicked();
     void on_autoAppearCheckBox_clicked();
     void on_carTextComboBox_activated(int index);
-
     void on_reactionSlider_sliderMoved(int val);
+    void on_spinMinCarLengthBox_valueChanged(int val);
+    void on_spinMaxCarLengthBox_valueChanged(int val);
 
 private:
     Ui::ManipulatorWindow *ui;
     std::shared_ptr<Settings> settings_;
-    std::shared_ptr<QTimer> updateTimer_, addRandomCarTimer_;
-    std::vector<std::shared_ptr<Lane>> lanes_;
-    std::weak_ptr<Car> carToShowInfo;
+    std::shared_ptr<Highway> highway_;
 };
 
 #endif // MANIPULATOR_H

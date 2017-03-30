@@ -37,7 +37,7 @@ private:
     std::weak_ptr<Car> insertCar(std::shared_ptr<Car> &car);
     std::weak_ptr<Car> getLeadingCarInLane(std::shared_ptr<Lane> lane, double pos);
     std::weak_ptr<Car> getFollowingCarInLane(std::shared_ptr<Lane> lane, double pos);
-    bool checkLane(std::weak_ptr<Lane> lane, std::shared_ptr<Car> car);
+    bool checkLane(std::weak_ptr<Lane> lane);
     void startTimer();
     bool tryChangeLane(std::vector<std::shared_ptr<Car>>::iterator &car, MoveDirection dir, double leadingSpeed = 0.0);
     //bool tryChangeLane(std::shared_ptr<Car> car, std::shared_ptr<Car> leadingCar, MoveDirection dir);

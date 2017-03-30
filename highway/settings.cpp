@@ -81,6 +81,10 @@ unsigned Settings::getReaction() {
     return reaction;
 }
 
+unsigned Settings::getRandomCarLength() {
+    return minCarLength + rand()%(maxCarLength - minCarLength + 1);
+}
+
 //SETTERS
 void Settings::setMinSpeed(int speed) {
     minSpeed = speed;
@@ -145,4 +149,12 @@ void Settings::setPause(bool state) {
 
 void Settings::setReaction(unsigned val) {
     reaction = val;
+}
+
+void Settings::setMinCarLength(unsigned val) {
+    minCarLength = val;
+}
+
+void Settings::setMaxCarLength(unsigned val) {
+    maxCarLength = val;
 }

@@ -52,13 +52,13 @@ void Lane::setRight(std::weak_ptr<Lane> right) {
 void Lane::addCar() {
     double maxCurrentSpeed = -1;
     if (cars_.size() == 0 ||
-        (cars_.back()->getPos() > settings_->getMinDistance()*cars_.back()->getLength())) {
+        (cars_.back()->getPos() - cars_.back()->getLength() > settings_->getMinDistance()*cars_.back()->getLength())) {
         if (cars_.size() != 0) {
             auto leadingCar = cars_.back();
             if (leadingCar->getPos() < settings_->getMaxDistance()*leadingCar->getLength())
                 maxCurrentSpeed = cars_.back()->getReactionSpeed();
         }
-        cars_.push_back(std::make_shared<Car>(settings_, maxCurrentSpeed, settings_->getCarID()));
+        cars_.push_back(std::make_shared<Car>(settings_, maxCurrentSpeed, settings_->getRandomCarLength(), settings_->getCarID()));
         scene_->addItem(cars_.back().get());
     }
 }
@@ -97,8 +97,11 @@ std::weak_ptr<Car> Lane::getFollowingCarInLane(std::shared_ptr<Lane> lane, doubl
     return followingCar;
 }
 
-bool Lane::checkLane(std::weak_ptr<Lane> lane, std::shared_ptr<Car> car) {
-    std::shared_ptr<Lane> lane_;
+bool Lane::checkLane(std::weak_ptr<Lane> lane) {
+    //std::shared_ptr<Lane> lane_;
+    if (lane.lock()) return true;
+    else return false;
+    /*
     if ((lane_ = lane.lock())) {
         double carPos = car->getPos();
         double minDistance = car->getDangerousDistance();
@@ -108,39 +111,43 @@ bool Lane::checkLane(std::weak_ptr<Lane> lane, std::shared_ptr<Car> car) {
             if (iterCarPos < carPos) break;
         }
         return true;
-    } else return false;
+    } else return false;*/
 }
 
 bool Lane::tryChangeLane(std::vector<std::shared_ptr<Car>>::iterator &car,
                          MoveDirection dir, double leadingSpeed) {
+    if ((*car)->getChangeLineLimit()) return false;
     std::weak_ptr<Lane> lane_ = dir == Left ? left_ : right_;
     if ((*car)->isBroken() ||
         ((*car)->isCrawling() && isOpened()) ||
-        !checkLane(lane_, (*car)))
+        !checkLane(lane_))
         return false;
 
     std::shared_ptr<Lane> lane = lane_.lock();
     if (lane->isClosed()) return false;
 
     std::shared_ptr<Car> leadingCar = getLeadingCarInLane(lane, (*car)->getPos()).lock();
-    std::shared_ptr<Car> followingCar = getFollowingCarInLane(lane, (*car)->getPos()).lock();
     if (leadingCar) {
-        double dist = fabs(leadingCar->getPos() - (*car)->getPos());
-        if ((dist < (*car)->getDangerousDistance()) &&
-                (leadingCar->getReactionSpeed() < (*car)->getRealSpeed()))
-            return false;
+        double dist = leadingCar->getPos() - leadingCar->getLength() - (*car)->getPos();
+        if (dist <= (*car)->getDangerousDistance()) return false;
+        //if ((dist < (*car)->getDangerousDistance()) &&
+        //        (leadingCar->getReactionSpeed() < (*car)->getRealSpeed()))
+        //    return false;
         else if ((dist < (*car)->getBrakeDistance()) &&
                  (leadingCar->getReactionSpeed() < leadingSpeed))
             return false;
     }
+    std::shared_ptr<Car> followingCar = getFollowingCarInLane(lane, (*car)->getPos()).lock();
     if (followingCar) {
-        double dist = fabs((*car)->getPos() - followingCar->getPos());
-        if ((dist < (*car)->getBrakeDistance()) &&
+        double dist = (*car)->getPos() - (*car)->getLength() - followingCar->getPos();
+        if (dist <= (*car)->getDangerousDistance()) return false;
+        if ((dist < followingCar->getBrakeDistance()) &&
             ((*car)->getRealSpeed() < followingCar->getReactionSpeed())) {
             return false;
         }
     }
     //insert car
+    (*car)->setChangeLineLimit(100);
     leadingCar = lane->insertCar(*car).lock();
     if (dir == Left) {
         moveForward(*car);

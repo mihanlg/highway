@@ -10,7 +10,6 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
-
 #include <queue>
 
 #include "settings.h"
@@ -29,15 +28,15 @@ public:
     double getRealSpeed();
     double getDangerousDistance();
     double getBrakeDistance();
-    void setChangeLineLimit(int limit);
-    int getChangeLineLimit();
+    void setChangeLaneLimit(int limit);
+    int getChangeLaneLimit();
     void checkBrakeTimer();
     void brake(double meanSpeed);
     void crawl();
-    void follow(std::shared_ptr<Car> toFollowCar);
-    void unfollow(std::shared_ptr<Car> leadingCar);
+    void follow(std::shared_ptr<Car> &toFollowCar);
+    void unfollow(std::shared_ptr<Car> &leadingCar);
     void move();
-    void move(std::shared_ptr<Car> leading);
+    void move(std::shared_ptr<Car> &leading);
     bool isFollowed();
     bool isFollowing();
     bool isBroken();
@@ -45,12 +44,12 @@ public:
     int getCarID();
     void updateText();
 protected:
-    void setSpeed(double toSpeed);
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
-public slots:
+private slots:
     void fix();
 private:
+    void setSpeed(double toSpeed);
     void setPos(qreal pos);
 public:
     enum CarState {

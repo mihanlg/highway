@@ -62,8 +62,7 @@ Manipulator::~Manipulator()
 
 //INTERFACE
 void Manipulator::updateNLanesLabel() {
-    std::string nLabelsString = std::to_string(highway_->getNLanes());
-
+    std::string nLabelsString = std::to_string(highway_->getOpenedNLanes());
     ui->nLanesLabel->setText(nLabelsString.c_str());
 }
 
@@ -77,8 +76,8 @@ void Manipulator::on_addLaneButton_clicked()
 }
 
 void Manipulator::drawHighway(unsigned nLanes) {
-    if (nLanes == 0) nLanes = highway_->getSize();
-    highway_->clear();
+    if (nLanes == 0) nLanes = highway_->getTotalNLanes();
+    highway_->destroy();
     for (unsigned i = 0; i < nLanes; ++i) {
         Lane* lane = highway_->addLane();
         ui->roadLayout->addLayout(lane);

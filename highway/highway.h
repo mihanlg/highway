@@ -19,15 +19,15 @@ public:
     Lane* addLane();
     void deleteLane();
     void addRandomCar();
-    void clean();
+    void clean(); //removes cars from highway
     void checkTimers();
     void startUpdateTimer();
     void startAddRandomCarTimer();
     void stopAddRandomCarTimer();
     void setAddRandomCarTimerInterval(double interval);
-    void clear();
-    int getSize();
-    int getNLanes();
+    void destroy(); //deletes all lanes
+    int getTotalNLanes();
+    int getOpenedNLanes();
 private slots:
     void updateLanes();
     void addRandomCarWithTimer();

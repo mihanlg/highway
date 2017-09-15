@@ -53,15 +53,15 @@ void Highway::setAddRandomCarTimerInterval(double interval) {
     addRandomCarTimer_->setInterval(interval);
 }
 
-void Highway::clear() {
+void Highway::destroy() {
     lanes_.clear();
 }
 
-int Highway::getSize() {
+int Highway::getTotalNLanes() {
     return lanes_.size();
 }
 
-int Highway::getNLanes() {
+int Highway::getOpenedNLanes() {
     return lanes_.size() - lanes_.back()->isClosed();
 }
 

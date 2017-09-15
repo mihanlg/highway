@@ -44,11 +44,11 @@ double Car::getBrakeDistance() {
     return settings_->getMaxDistance()*baseCarLength;
 }
 
-void Car::setChangeLineLimit(int limit) {
+void Car::setChangeLaneLimit(int limit) {
     changeLineLimit_ = limit;
 }
 
-int Car::getChangeLineLimit() {
+int Car::getChangeLaneLimit() {
     return changeLineLimit_;
 }
 
@@ -156,7 +156,7 @@ void Car::fix() {
     checkBrakeTimer();
 }
 
-void Car::follow(std::shared_ptr<Car> toFollowCar) {
+void Car::follow(std::shared_ptr<Car> &toFollowCar) {
     state_ = Following;
     toFollowCar->isFollowed_ = true;
     qreal dist = toFollowCar->getPos() - toFollowCar->getLength() - getPos();
@@ -170,7 +170,7 @@ void Car::follow(std::shared_ptr<Car> toFollowCar) {
     } else unfollow(toFollowCar);
 }
 
-void Car::unfollow(std::shared_ptr<Car> leadingCar) {
+void Car::unfollow(std::shared_ptr<Car> &leadingCar) {
     leadingCar->isFollowed_ = false;
     if (state_ == Following) state_ = Moving;
     followingSpeed_ = initSpeed_;
@@ -188,7 +188,7 @@ void Car::move() {
     moveBy(0, currentSpeed_/speedCoef);
 }
 
-void Car::move(std::shared_ptr<Car> leading) {
+void Car::move(std::shared_ptr<Car> &leading) {
     if (state_ != Broken && state_ != Crawling) {
         qreal dist = leading->getPos() - leading->getLength() - getPos();
         qreal brakeDist = getBrakeDistance();

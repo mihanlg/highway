@@ -63,7 +63,7 @@ bool Settings::isAutoFixOn() {
     return autoFixState;
 }
 
-int Settings::getCarID() {
+int Settings::getUniqueCarID() {
     return ++lastCarID;
 }
 

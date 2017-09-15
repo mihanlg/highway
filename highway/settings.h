@@ -45,18 +45,17 @@ public:
     double getRandomAppearTime();
     double getMinDistance();
     double getMaxDistance();
-    int getCarID();
+    int getUniqueCarID();
     int getAutoFixTime();
     bool isAutoFixOn();
     bool isAutoAppearOn() { return autoAppear; }
     int getCrawlingSpeed();
-    //std::weak_ptr<Car> getCarInfo() { return carToShowInfo; }
-    //void setCarInfo(std::weak_ptr<Car> car) { carToShowInfo = car; }
-    showInfo getShowSpeed();
     bool isPaused();
     void setPause(bool state);
     unsigned getReaction();
     unsigned getRandomCarLength();
+    //GUI
+    showInfo getShowSpeed();
     double getWidth();
     double getScale();
     void updateWidth(double dw);
@@ -75,10 +74,11 @@ private:
     void setAutoFixTime(int time);
     void setAutoFixState(bool state);
     void setCrawlingSpeed(int speed);
-    void setShowSpeed(showInfo state);
     void setReaction(unsigned val);
     void setMinCarLength(unsigned val);
     void setMaxCarLength(unsigned val);
+    //GUI
+    void setShowSpeed(showInfo state);
 private:
     std::mt19937 generator;
     bool paused;
@@ -94,7 +94,6 @@ private:
     double minDistance, maxDistance;
     unsigned minCarLength, maxCarLength;
     double width, scale;
-    //std::weak_ptr<Car> carToShowInfo;
 };
 
 #endif // SETTINGS_H

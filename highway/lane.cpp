@@ -15,8 +15,6 @@ Lane::Lane(std::shared_ptr<Settings> &settings, std::weak_ptr<Lane> &left,
     QBrush roadBrush = QBrush(QPixmap(bg.scaledToWidth(baseLaneWidth)));
 
     laneView_ = std::make_shared<LaneView>(settings_);
-    //laneView_->setMinimumWidth(baseLaneWidth);
-    //laneView_->setMaximumWidth(baseLaneWidth);
     laneView_->setFixedWidth(settings_->getWidth());
     laneView_->setMinimumHeight(minLaneHeight);
 
@@ -35,7 +33,6 @@ Lane::Lane(std::shared_ptr<Settings> &settings, std::weak_ptr<Lane> &left,
 
     button_ = std::make_shared<QPushButton>();
     button_->setText(tr("+"));
-    //button_->setMinimumWidth(baseLaneWidth);
     button_->setFixedWidth(settings_->getWidth());
     connect(button_.get(), SIGNAL(clicked()), this, SLOT(addCar()));
 
@@ -60,7 +57,7 @@ void Lane::addCar() {
             if (leadingCar->getPos() - cars_.back()->getLength() < settings_->getMaxDistance()*baseCarLength)
                 maxCurrentSpeed = cars_.back()->getReactionSpeed();
         }
-        cars_.push_back(std::make_shared<Car>(settings_, maxCurrentSpeed, settings_->getRandomCarLength(), settings_->getCarID()));
+        cars_.push_back(std::make_shared<Car>(settings_, maxCurrentSpeed, settings_->getRandomCarLength(), settings_->getUniqueCarID()));
         scene_->addItem(cars_.back().get());
     }
 }
@@ -78,18 +75,18 @@ std::weak_ptr<Car> Lane::insertCar(std::shared_ptr<Car> &car) {
     return leading;
 }
 
-std::weak_ptr<Car> Lane::getLeadingCarInLane(std::shared_ptr<Lane> lane, double pos) {
+std::weak_ptr<Car> Lane::getLeadingCarInLane(double pos) {
     std::shared_ptr<Car> leadingCar;
-    for (auto iterCar: lane->cars_) {
+    for (auto iterCar: cars_) {
         if (iterCar->getPos() > pos) leadingCar = iterCar;
         else break;
     }
     return leadingCar;
 }
 
-std::weak_ptr<Car> Lane::getFollowingCarInLane(std::shared_ptr<Lane> lane, double pos) {
+std::weak_ptr<Car> Lane::getFollowingCarInLane(double pos) {
     std::shared_ptr<Car> followingCar;
-    for (auto iterCar: lane->cars_) {
+    for (auto iterCar: cars_) {
         if (iterCar->getPos() > pos) continue;
         else {
             followingCar = iterCar;
@@ -99,14 +96,14 @@ std::weak_ptr<Car> Lane::getFollowingCarInLane(std::shared_ptr<Lane> lane, doubl
     return followingCar;
 }
 
-bool Lane::checkLane(std::weak_ptr<Lane> lane) {
+bool Lane::checkLane(std::weak_ptr<Lane> &lane) {
     if (lane.lock()) return true;
     else return false;
 }
 
 bool Lane::tryChangeLane(std::vector<std::shared_ptr<Car>>::iterator &car,
                          MoveDirection dir, double leadingSpeed) {
-    if ((*car)->getChangeLineLimit()) return false;
+    if ((*car)->getChangeLaneLimit()) return false;
     std::weak_ptr<Lane> lane_ = dir == Left ? left_ : right_;
     if ((*car)->isBroken() ||
         ((*car)->isCrawling() && isOpened()) ||
@@ -116,18 +113,15 @@ bool Lane::tryChangeLane(std::vector<std::shared_ptr<Car>>::iterator &car,
     std::shared_ptr<Lane> lane = lane_.lock();
     if (lane->isClosed()) return false;
 
-    std::shared_ptr<Car> leadingCar = getLeadingCarInLane(lane, (*car)->getPos()).lock();
+    std::shared_ptr<Car> leadingCar = lane->getLeadingCarInLane((*car)->getPos()).lock();
     if (leadingCar) {
         double dist = leadingCar->getPos() - leadingCar->getLength() - (*car)->getPos();
         if (dist <= (*car)->getDangerousDistance()) return false;
-        //if ((dist < (*car)->getDangerousDistance()) &&
-        //        (leadingCar->getReactionSpeed() < (*car)->getRealSpeed()))
-        //    return false;
         else if ((dist < (*car)->getBrakeDistance()) &&
                  (leadingCar->getReactionSpeed() < leadingSpeed))
             return false;
     }
-    std::shared_ptr<Car> followingCar = getFollowingCarInLane(lane, (*car)->getPos()).lock();
+    std::shared_ptr<Car> followingCar = lane->getFollowingCarInLane((*car)->getPos()).lock();
     if (followingCar) {
         double dist = (*car)->getPos() - (*car)->getLength() - followingCar->getPos();
         if (dist <= (*car)->getDangerousDistance()) return false;
@@ -137,7 +131,7 @@ bool Lane::tryChangeLane(std::vector<std::shared_ptr<Car>>::iterator &car,
         }
     }
     //insert car
-    (*car)->setChangeLineLimit(100);
+    (*car)->setChangeLaneLimit(100);
     leadingCar = lane->insertCar(*car).lock();
     if (dir == Left) {
         moveForward(*car);
@@ -150,11 +144,11 @@ bool Lane::tryChangeLane(std::vector<std::shared_ptr<Car>>::iterator &car,
     return true;
 }
 
-void Lane::moveForward(std::shared_ptr<Car> car) {
+void Lane::moveForward(std::shared_ptr<Car> &car) {
     car->move();
 }
 
-void Lane::moveForward(std::shared_ptr<Car> car, std::shared_ptr<Car> leadingCar) {
+void Lane::moveForward(std::shared_ptr<Car> &car, std::shared_ptr<Car> &leadingCar) {
     car->move(leadingCar);
 }
 
